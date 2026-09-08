@@ -7,7 +7,7 @@
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- FontAwesome for Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
   <style>
     /* Custom Scrollbar */
     ::-webkit-scrollbar { width: 6px; }
@@ -45,14 +45,14 @@
 
     <!-- Left Column: Status & Meters -->
     <div class="md:col-span-1 space-y-4">
-      
+
       <!-- Excitement Gauge Card -->
       <div id="statusCard" class="bg-gray-800 rounded-2xl p-5 border border-gray-700 shadow-xl text-center relative overflow-hidden">
         <div class="text-xs uppercase tracking-widest text-gray-400 font-bold mb-1">Buddy Status</div>
         <div id="moodBadge" class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-gray-700 text-gray-300 mb-3">
           Normal State
         </div>
-        
+
         <!-- EP Count -->
         <div class="flex justify-center items-baseline space-x-1 my-2">
           <span id="epDisplay" class="text-5xl font-black tracking-tight text-white">0</span>
@@ -78,7 +78,7 @@
       </div>
 
       <!-- Quick Tips -->
-      <div class="bg-gray-800/60 rounded-2xl p-4 border border-gray-700/60 text-xs text-gray-300 space-y-2">
+ <!--     <div class="bg-gray-800/60 rounded-2xl p-4 border border-gray-700/60 text-xs text-gray-300 space-y-2">
         <div class="font-bold text-yellow-400 flex items-center">
           <i class="fa-solid fa-lightbulb mr-2"></i> EP Rules & Tips
         </div>
@@ -88,12 +88,12 @@
           <li>Excited state (≥32 EP) decays -1 EP after 40m without actions.</li>
         </ul>
       </div>
-
+-->
     </div>
 
     <!-- Right Column: Interactive Tasks -->
     <div class="md:col-span-2 space-y-4">
-      
+
       <!-- 30-Min Cooldown Tasks -->
       <div>
         <h2 class="text-sm font-bold uppercase tracking-wider text-gray-400 mb-3 flex items-center">
@@ -183,6 +183,7 @@
     function init() {
       renderTasks();
       loadState();
+      checkNotificationPermissionOnLoad();
       setInterval(tick, 1000); // 1-second interval loop for timers & decay
     }
 
@@ -193,7 +194,7 @@
 
       cooldownTasks.forEach(task => {
         cdContainer.innerHTML += `
-          <button id="btn-${task.id}" onclick="triggerTask('${task.id}')" 
+          <button id="btn-${task.id}" onclick="triggerTask('${task.id}')"
             class="relative bg-gray-800 hover:bg-gray-700 border border-gray-700 p-3 rounded-xl flex flex-col items-center justify-center space-y-2 transition shadow text-center group">
             <i class="fa-solid ${task.icon} text-lg text-yellow-400 group-hover:scale-110 transition-transform"></i>
             <span class="text-xs font-semibold text-gray-200">${task.name}</span>
@@ -207,7 +208,7 @@
 
       noCooldownTasks.forEach(task => {
         noCdContainer.innerHTML += `
-          <button id="btn-${task.id}" onclick="triggerNoCooldownTask('${task.id}')" 
+          <button id="btn-${task.id}" onclick="triggerNoCooldownTask('${task.id}')"
             class="bg-gray-800 hover:bg-gray-700 border border-gray-700 p-3 rounded-xl flex items-center justify-between transition shadow group">
             <div class="flex items-center space-x-2">
               <i class="fa-solid ${task.icon} text-lg text-green-400 group-hover:scale-110 transition-transform"></i>
@@ -287,44 +288,44 @@
     }
 
     // System Tick Loop (Runs every second)
-function tick() {
-  if (!lastInteractionTimestamp) return;
+    function tick() {
+      if (!lastInteractionTimestamp) return;
 
-  const now = Date.now();
-  const elapsed = now - lastInteractionTimestamp;
-  const isExcited = currentEP >= 32;
+      const now = Date.now();
+      const elapsed = now - lastInteractionTimestamp;
+      const isExcited = currentEP >= 32;
 
-  // --- 1. GESTIONE NOTIFICA DECAY ---
-  const initialThreshold = isExcited ? EXCITED_DECAY_START : UNEXCITED_DECAY_START;
-  const warningTime = initialThreshold - (2 * 60 * 1000); // Avviso a -2 minuti dal decay
+      // --- 1. GESTIONE NOTIFICA DECAY ---
+      const initialThreshold = isExcited ? EXCITED_DECAY_START : UNEXCITED_DECAY_START;
+      const warningTime = initialThreshold - (2 * 60 * 1000); // Avviso a -2 minuti dal decay
 
-  if (elapsed >= warningTime && elapsed < initialThreshold && !decayNotified) {
-    sendDecayNotification(2);
-    decayNotified = true;
-  }
+      if (elapsed >= warningTime && elapsed < initialThreshold && !decayNotified) {
+        sendDecayNotification(2);
+        decayNotified = true;
+      }
 
-  // Resetta il flag se viene fatta una nuova azione
-  if (elapsed < warningTime) {
-    decayNotified = false;
-  }
+      // Resetta il flag se viene fatta una nuova azione
+      if (elapsed < warningTime) {
+        decayNotified = false;
+      }
 
-  // --- 2. GESTIONE NOTIFICA TASK PRONTE ---
-  cooldownTasks.forEach(task => {
-    const lastUsed = taskCooldowns[task.id] || 0;
-    const taskElapsed = now - lastUsed;
+      // --- 2. GESTIONE NOTIFICA TASK PRONTE ---
+      cooldownTasks.forEach(task => {
+        const lastUsed = taskCooldowns[task.id] || 0;
+        const taskElapsed = now - lastUsed;
 
-    if (lastUsed > 0 && taskElapsed >= COOLDOWN_TIME_MS && !notifiedTasks[task.id]) {
-      sendTaskReadyNotification(task.name);
-      notifiedTasks[task.id] = true; // Segna come notificata
+        if (lastUsed > 0 && taskElapsed >= COOLDOWN_TIME_MS && !notifiedTasks[task.id]) {
+          sendTaskReadyNotification(task.name);
+          notifiedTasks[task.id] = true; // Segna come notificata
+        }
+
+        if (taskElapsed < COOLDOWN_TIME_MS) {
+          notifiedTasks[task.id] = false; // Ripristina quando la task viene usata di nuovo
+        }
+      });
+
+      updateUI();
     }
-    
-    if (taskElapsed < COOLDOWN_TIME_MS) {
-      notifiedTasks[task.id] = false; // Ripristina quando la task viene usata di nuovo
-    }
-  });
-
-  updateUI();
-}
 
 
     // UI Render Engine
@@ -354,7 +355,7 @@ function tick() {
         const elapsed = now - lastInteractionTimestamp;
         const isExcited = currentEP >= 32;
         const initialThreshold = isExcited ? EXCITED_DECAY_START : UNEXCITED_DECAY_START;
-        
+
         let remaining;
         if (elapsed < initialThreshold) {
           remaining = initialThreshold - elapsed;
@@ -471,61 +472,71 @@ function tick() {
       updateUI();
     }
 
-// Stato Notifiche
-let notificationsEnabled = false;
-let notifiedTasks = {}; // Per evitare notifiche doppie
-let decayNotified = false;
+    // Stato Notifiche
+    let notificationsEnabled = false;
+    let notifiedTasks = {}; // Per evitare notifiche doppie
+    let decayNotified = false;
 
-// 1. Richiesta Permesso
-function requestNotificationPermission() {
-  if (!("Notification" in window)) {
-    alert("Il tuo browser non supporta le notifiche desktop.");
-    return;
-  }
+    // 1. Richiesta Permesso
+    function requestNotificationPermission() {
+      if (!("Notification" in window)) {
+        alert("Il tuo browser non supporta le notifiche desktop.");
+        return;
+      }
 
-  Notification.requestPermission().then(permission => {
-    if (permission === "granted") {
-      notificationsEnabled = true;
-      updateNotificationBtn();
-      sendNotification("Notifiche Attive! 🔔", "Ti avviseremo quando i cooldown saranno pronti o prima che il tuo Buddy perda EP.");
+      Notification.requestPermission().then(permission => {
+        if (permission === "granted") {
+          notificationsEnabled = true;
+          updateNotificationBtn();
+        }
+      });
     }
-  });
-}
 
-function updateNotificationBtn() {
-  const btn = document.getElementById('notifBtn');
-  if (Notification.permission === "granted") {
-    btn.className = "px-3 py-1.5 bg-green-700 text-xs font-semibold rounded-lg border border-green-600 cursor-default";
-    btn.innerHTML = `<i class="fa-solid fa-bell-concierge mr-1"></i> Notifiche Attive`;
-    btn.onclick = null;
-  }
-}
+    // Controlla i permessi già concessi all'apertura dell'app
+    function checkNotificationPermissionOnLoad() {
+      if ("Notification" in window) {
+        if (Notification.permission === "granted") {
+          notificationsEnabled = true;
+          updateNotificationBtn(); // Aggiorna la grafica del pulsante in "Notifiche Attive"
+        }
+      }
+    }
 
-// 2. Helper per inviare la notifica
- // 1. Notifica Specifica per il DECAY (Urgenza / Pericolo)
-function sendDecayNotification(minutiRimanenti) {
-  if (Notification.permission === "granted") {
-    new Notification("⚠️ ATTENZIONE: Il tuo Buddy sta per stancarsi!", {
-      body: `Mancano solo ${minutiRimanenti} minuti prima di perdere EP per inattività. Fai un'azione rapida!`,
-      icon: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png",
-      tag: "buddy-decay", // Sovrascrive eventuali vecchie notifiche di decay accumulate
-      vibrate: [200, 100, 200], // Vibrazione di allarme (su mobile)
-      requireInteraction: true // La notifica rimane a schermo finché non ci si clicca
-    });
-  }
-}
+    // Aggiorna l'aspetto del pulsante quando le notifiche sono attive
+    function updateNotificationBtn() {
+      const btn = document.getElementById('notifBtn');
+      if (btn && Notification.permission === "granted") {
+        btn.className = "px-3 py-1.5 bg-green-700 text-xs font-semibold rounded-lg border border-green-600 cursor-default flex items-center";
+        btn.innerHTML = `<i class="fa-solid fa-bell-concierge mr-1"></i> Notifiche Attive`;
+        btn.onclick = null; // Disabilita il click poiché già attive
+      }
+    }
 
-// 2. Notifica Specifica per le TASK PRONTE (Opportunità)
-function sendTaskReadyNotification(taskName) {
-  if (Notification.permission === "granted") {
-    new Notification(`⏱️ Task Disponibile: ${taskName}`, {
-      body: `Il cooldown di 30 minuti per "${taskName}" è terminato. Puoi guadagnare altri +2 EP!`,
-      icon: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/pinap-berry.png",
-      tag: `task-ready-${taskName}`,
-      vibrate: [100, 50, 100] // Vibrazione breve
-    });
-  }
-}
+    // 2. Helper per inviare la notifica
+     // 1. Notifica Specifica per il DECAY (Urgenza / Pericolo)
+    function sendDecayNotification(minutiRimanenti) {
+      if (Notification.permission === "granted") {
+        new Notification("⚠️ ATTENZIONE: Il tuo Buddy sta per stancarsi!", {
+          body: `Mancano solo ${minutiRimanenti} minuti prima di perdere EP per inattività. Fai un'azione rapida!`,
+          icon: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png",
+          tag: "buddy-decay", // Sovrascrive eventuali vecchie notifiche di decay accumulate
+          vibrate: [200, 100, 200], // Vibrazione di allarme (su mobile)
+          requireInteraction: true // La notifica rimane a schermo finché non ci si clicca
+        });
+      }
+    }
+
+    // 2. Notifica Specifica per le TASK PRONTE (Opportunità)
+    function sendTaskReadyNotification(taskName) {
+      if (Notification.permission === "granted") {
+        new Notification(`⏱️ Task Disponibile: ${taskName}`, {
+          body: `Il cooldown di 30 minuti per "${taskName}" è terminato. Puoi guadagnare altri +2 EP!`,
+          icon: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/pinap-berry.png",
+          tag: `task-ready-${taskName}`,
+          vibrate: [100, 50, 100] // Vibrazione breve
+        });
+      }
+    }
     // Start App
     window.onload = init;
   </script>
