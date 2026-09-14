@@ -5,17 +5,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pokémon GO Buddy Excitement Tracker</title>
 
-    <!-- Favicon per la Tab del Browser -->
-    <link rel="icon" type="image/png"
-          href="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png">
+    <!-- 1. Favicon Standard (Browser Desktop Moderni & SVG) -->
+    <link rel="icon" type="image/svg+xml"
+          href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' rx='40' fill='%230f172a'/><circle cx='90' cy='78' r='58' fill='%231e293b'/><path d='M 32 78 A 58 58 0 0 1 148 78 Z' fill='%23ef4444'/><path d='M 32 78 A 58 58 0 0 0 148 78 Z' fill='%23f8fafc'/><rect x='32' y='72' width='116' height='12' fill='%230f172a'/><circle cx='90' cy='78' r='18' fill='%230f172a'/><circle cx='90' cy='78' r='11' fill='%23f8fafc'/><circle cx='90' cy='78' r='6' fill='%23cbd5e1'/><text x='90' y='155' font-family='system-ui, -apple-system, sans-serif' font-weight='900' font-size='18' fill='%23f8fafc' text-anchor='middle' letter-spacing='1'>POGO BUDDY</text></svg>">
 
-    <!-- Tailwind CSS v3 Engine (Ripristina colori, sfumature e font corretti) -->
+    <!-- 2. Apple / Safari (iOS - Schermata Home) -->
+    <link rel="apple-touch-icon"
+          href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' rx='40' fill='%230f172a'/><circle cx='90' cy='78' r='58' fill='%231e293b'/><path d='M 32 78 A 58 58 0 0 1 148 78 Z' fill='%23ef4444'/><path d='M 32 78 A 58 58 0 0 0 148 78 Z' fill='%23f8fafc'/><rect x='32' y='72' width='116' height='12' fill='%230f172a'/><circle cx='90' cy='78' r='18' fill='%230f172a'/><circle cx='90' cy='78' r='11' fill='%23f8fafc'/><circle cx='90' cy='78' r='6' fill='%23cbd5e1'/><text x='90' y='155' font-family='system-ui, -apple-system, sans-serif' font-weight='900' font-size='18' fill='%23f8fafc' text-anchor='middle' letter-spacing='1'>POGO BUDDY</text></svg>">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="PoGo Buddy">
+
+    <!-- 3. Android / Google Chrome (Web App & Tema) -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="application-name" content="PoGo Buddy">
+
+    <!-- 4. Windows / Microsoft Edge (Start Menu Tiles) -->
+    <meta name="msapplication-TileColor" content="#0f172a">
+    <meta name="msapplication-TileImage"
+          content="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' rx='40' fill='%230f172a'/><circle cx='90' cy='78' r='58' fill='%231e293b'/><path d='M 32 78 A 58 58 0 0 1 148 78 Z' fill='%23ef4444'/><path d='M 32 78 A 58 58 0 0 0 148 78 Z' fill='%23f8fafc'/><rect x='32' y='72' width='116' height='12' fill='%230f172a'/><circle cx='90' cy='78' r='18' fill='%230f172a'/><circle cx='90' cy='78' r='11' fill='%23f8fafc'/><circle cx='90' cy='78' r='6' fill='%23cbd5e1'/><text x='90' y='155' font-family='system-ui, -apple-system, sans-serif' font-weight='900' font-size='18' fill='%23f8fafc' text-anchor='middle' letter-spacing='1'>POGO BUDDY</text></svg>">
+
+    <!-- Tailwind CSS v3 Engine -->
     <script src="https://cdn.tailwindcss.com"></script>
 
     <!-- FontAwesome 6.6.0 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 
-    <!-- QR Code Generator & Scanner Libraries -->
+    <!-- QR Code Generator & Scanner -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://unpkg.com/html5-qrcode"></script>
 
@@ -58,13 +75,15 @@
             <!-- Toggle Notifiche -->
             <button id="notifBtn" onclick="toggleNotifications()"
                     class="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-xs font-semibold rounded-lg transition border border-gray-600 flex items-center">
-                <i class="fa-solid fa-bell mr-1"></i> Notifiche: OFF
+                <i class="fa-solid fa-bell"></i>
+                <span class="hidden sm:inline ml-1">Notifiche: OFF</span>
             </button>
 
             <!-- Pulsante Reset Semplificato -->
             <button onclick="resetAll()"
                     class="px-3 py-1.5 bg-gray-700 hover:bg-red-600 text-xs font-semibold rounded-lg transition duration-200 border border-gray-600 flex items-center">
-                <i class="fa-solid fa-rotate-right mr-1"></i> Reset
+                <i class="fa-solid fa-rotate-right"></i>
+                <span class="hidden sm:inline ml-1">Reset</span>
             </button>
         </div>
 
@@ -471,10 +490,10 @@
 
         if (notificationsEnabled) {
             btn.className = "px-3 py-1.5 bg-green-700 hover:bg-green-600 text-xs font-semibold rounded-lg border border-green-600 transition flex items-center";
-            btn.innerHTML = `<i class="fa-solid fa-bell-concierge mr-1"></i> Notifiche: ON`;
+            btn.innerHTML = `<i class="fa-solid fa-bell-concierge"></i><span class="hidden sm:inline ml-1">Notifiche: ON</span>`;
         } else {
             btn.className = "px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-xs font-semibold rounded-lg border border-gray-600 transition flex items-center";
-            btn.innerHTML = `<i class="fa-solid fa-bell mr-1"></i> Notifiche: OFF`;
+            btn.innerHTML = `<i class="fa-solid fa-bell"></i> <span class="hidden sm:inline ml-1">Notifiche: OFF</span>`;
         }
     }
 
